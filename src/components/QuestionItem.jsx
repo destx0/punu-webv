@@ -35,13 +35,15 @@ export default function QuestionItem({
 				onClick={() => toggleAccordion(`${playlistId}-${index}`)}
 				className="flex flex-col items-start text-left"
 			>
-				<span className="font-bold mr-2 self-start">
-					Q{serialNumber}:
-				</span>
-				<div
-					className="text-left w-full mt-1"
-					dangerouslySetInnerHTML={{ __html: quiz.question }}
-				/>
+				<div className="flex w-full text-left px-4 py-2">
+					<span className="font-bold mr-4 text-gray-500">
+						Q{serialNumber}.
+					</span>
+					<div
+						className="flex-1"
+						dangerouslySetInnerHTML={{ __html: quiz.question }}
+					/>
+				</div>
 			</AccordionTrigger>
 			<AccordionContent>
 				<ul className="list-none pl-0 mb-4">
