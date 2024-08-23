@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import {
 	AccordionItem,
@@ -28,41 +27,56 @@ export default function QuestionItem({
 	hideDeleteButton,
 	serialNumber,
 }) {
+	const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
 	return (
 		<AccordionItem value={`${playlistId}-${index}`}>
 			<AccordionTrigger
 				onClick={() => toggleAccordion(`${playlistId}-${index}`)}
+				className="flex flex-col items-start text-left"
 			>
-				<span className="font-bold mr-2">Q{serialNumber}:</span>
-				<div dangerouslySetInnerHTML={{ __html: quiz.question }} />
+				<span className="font-bold mr-2 self-start">
+					Q{serialNumber}:
+				</span>
+				<div
+					className="text-left w-full mt-1"
+					dangerouslySetInnerHTML={{ __html: quiz.question }}
+				/>
 			</AccordionTrigger>
 			<AccordionContent>
-				<ul className="list-disc pl-5 mb-4">
+				<ul className="list-none pl-0 mb-4">
 					{quiz.options.map((option, optionIndex) => (
 						<li
 							key={optionIndex}
-							className={
-								option === quiz.correctAnswer ? "font-bold" : ""
-							}
-							dangerouslySetInnerHTML={{ __html: option }}
-						/>
+							className={`mb-2 p-2 rounded ${
+								optionIndex === quiz.correctAnswer
+									? "bg-green-100 border-green-500 border"
+									: "bg-gray-100"
+							}`}
+						>
+							<span className="font-bold mr-2">
+								{optionLetters[optionIndex]}.
+							</span>
+							<span
+								dangerouslySetInnerHTML={{ __html: option }}
+							/>
+							{optionIndex === quiz.correctAnswer && (
+								<span className="ml-2 text-green-600 font-bold">
+									(Correct Answer)
+								</span>
+							)}
+						</li>
 					))}
 				</ul>
-				<p className="mb-4">
-					<strong>Correct Answer:</strong>
-					<span
-						dangerouslySetInnerHTML={{ __html: quiz.correctAnswer }}
-					/>
-				</p>
 				{quiz.explanation && (
-					<p className="mb-4">
+					<div className="mb-4 p-2 bg-blue-100 rounded">
 						<strong>Explanation:</strong>
 						<span
 							dangerouslySetInnerHTML={{
 								__html: quiz.explanation,
 							}}
 						/>
-					</p>
+					</div>
 				)}
 				{!hideDeleteButton && (
 					<AlertDialog>
