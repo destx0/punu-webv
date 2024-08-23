@@ -19,6 +19,7 @@ export default function QuizComponent() {
 	const [playlists, setPlaylists] = useState([]);
 	const [questions, setQuestions] = useState({});
 	const [openAccordions, setOpenAccordions] = useState({});
+	const [hideDeleteButtons, setHideDeleteButtons] = useState(false);
 
 	useEffect(() => {
 		fetchData();
@@ -96,6 +97,10 @@ export default function QuizComponent() {
 		}
 	};
 
+	const toggleHideDeleteButtons = () => {
+		setHideDeleteButtons((prev) => !prev);
+	};
+
 	return (
 		<Tabs defaultValue={playlists[0]?.id}>
 			<TabsList>
@@ -107,9 +112,18 @@ export default function QuizComponent() {
 			</TabsList>
 			{playlists.map((playlist) => (
 				<TabsContent key={playlist.id} value={playlist.id}>
-					<Button onClick={() => toggleAllAccordions(playlist.id)}>
-						Toggle All Questions
-					</Button>
+					<div className="flex space-x-2 mb-4">
+						<Button
+							onClick={() => toggleAllAccordions(playlist.id)}
+						>
+							Toggle All Questions
+						</Button>
+						<Button onClick={toggleHideDeleteButtons}>
+							{hideDeleteButtons
+								? "Show Delete Buttons"
+								: "Hide Delete Buttons"}
+						</Button>
+					</div>
 					<Accordion
 						type="multiple"
 						value={Object.keys(openAccordions).filter(
@@ -127,6 +141,8 @@ export default function QuizComponent() {
 								isOpen={
 									openAccordions[`${playlist.id}-${index}`]
 								}
+								hideDeleteButton={hideDeleteButtons}
+								serialNumber={index + 1}
 							/>
 						))}
 					</Accordion>

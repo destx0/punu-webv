@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
 	AccordionItem,
@@ -24,12 +25,15 @@ export default function QuestionItem({
 	deleteQuestion,
 	toggleAccordion,
 	isOpen,
+	hideDeleteButton,
+	serialNumber,
 }) {
 	return (
 		<AccordionItem value={`${playlistId}-${index}`}>
 			<AccordionTrigger
 				onClick={() => toggleAccordion(`${playlistId}-${index}`)}
 			>
+				<span className="font-bold mr-2">Q{serialNumber}:</span>
 				<div dangerouslySetInnerHTML={{ __html: quiz.question }} />
 			</AccordionTrigger>
 			<AccordionContent>
@@ -60,33 +64,37 @@ export default function QuestionItem({
 						/>
 					</p>
 				)}
-				<AlertDialog>
-					<AlertDialogTrigger asChild>
-						<Button variant="destructive">Delete Question</Button>
-					</AlertDialogTrigger>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>
-								Are you absolutely sure?
-							</AlertDialogTitle>
-							<AlertDialogDescription>
-								This action cannot be undone. This will
-								permanently delete the question from the
-								database.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction
-								onClick={() =>
-									deleteQuestion(playlistId, quiz.id)
-								}
-							>
-								Delete
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
+				{!hideDeleteButton && (
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button variant="destructive">
+								Delete Question
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>
+									Are you absolutely sure?
+								</AlertDialogTitle>
+								<AlertDialogDescription>
+									This action cannot be undone. This will
+									permanently delete the question from the
+									database.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={() =>
+										deleteQuestion(playlistId, quiz.id)
+									}
+								>
+									Delete
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+				)}
 			</AccordionContent>
 		</AccordionItem>
 	);
