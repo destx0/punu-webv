@@ -25,7 +25,7 @@ export default function QuizComponent() {
 
 	return (
 		<Tabs defaultValue={playlists[0]?.id}>
-			<TabsList>
+			<TabsList className="print:hidden">
 				{playlists.map((playlist) => (
 					<TabsTrigger key={playlist.id} value={playlist.id}>
 						{playlist.name}
@@ -34,7 +34,7 @@ export default function QuizComponent() {
 			</TabsList>
 			{playlists.map((playlist) => (
 				<TabsContent key={playlist.id} value={playlist.id}>
-					<div className="flex space-x-2 mb-4">
+					<div className="flex space-x-2 mb-4 print:hidden">
 						<Button
 							onClick={() => toggleAllAccordions(playlist.id)}
 						>
@@ -46,6 +46,9 @@ export default function QuizComponent() {
 								: "Hide Delete Buttons"}
 						</Button>
 					</div>
+					<h2 className="hidden print:block text-2xl font-bold mb-4">
+						{playlist.name}
+					</h2>
 					<Accordion
 						type="multiple"
 						value={Object.keys(openAccordions).filter(

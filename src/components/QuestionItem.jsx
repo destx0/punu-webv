@@ -33,17 +33,19 @@ export default function QuestionItem({
 
 	const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 	const accordionId = `${playlistId}-${index}`;
-	const isOpen = openAccordions[accordionId];
 
 	return (
-		<AccordionItem value={accordionId}>
+		<AccordionItem
+			value={accordionId}
+			className="border-b print:border-b-black"
+		>
 			<AccordionTrigger
 				onClick={() => toggleAccordion(accordionId)}
-				className="flex flex-col items-start text-left"
+				className="py-1 px-0"
 			>
-				<div className="flex w-full text-left px-4 py-2">
-					<span className="font-bold mr-4 text-gray-500">
-						Q{serialNumber}.
+				<div className="flex w-full items-start text-left">
+					<span className="font-bold mr-2 text-gray-700 print:text-black">
+						{serialNumber}.
 					</span>
 					<div
 						className="flex-1"
@@ -52,33 +54,30 @@ export default function QuestionItem({
 				</div>
 			</AccordionTrigger>
 			<AccordionContent>
-				<ul className="list-none pl-0 mb-4">
+				<div className="flex flex-wrap gap-x-2 gap-y-1 py-1">
 					{quiz.options.map((option, optionIndex) => (
-						<li
+						<div
 							key={optionIndex}
-							className={`mb-2 p-2 rounded ${
+							className={`flex items-center p-0.5 rounded ${
 								optionIndex === quiz.correctAnswer
-									? "bg-green-100 border-green-500 border"
-									: "bg-gray-100"
+									? "bg-gray-200 print:bg-gray-300 font-bold underline"
+									: ""
 							}`}
 						>
-							<span className="font-bold mr-2">
+							{optionIndex === quiz.correctAnswer && (
+								<span className="mr-1 font-bold">✓</span>
+							)}
+							<span className="font-semibold mr-1">
 								{optionLetters[optionIndex]}.
 							</span>
 							<span
 								dangerouslySetInnerHTML={{ __html: option }}
 							/>
-							{optionIndex === quiz.correctAnswer && (
-								<span className="ml-2 text-green-600 font-bold">
-									(Correct Answer)
-								</span>
-							)}
-						</li>
+						</div>
 					))}
-				</ul>
+				</div>
 				{quiz.explanation && (
-					<div className="mb-4 p-2 bg-blue-100 rounded">
-						<strong>Explanation:</strong>
+					<div className="mt-1 text-sm italic print:text-gray-700">
 						<span
 							dangerouslySetInnerHTML={{
 								__html: quiz.explanation,
@@ -89,19 +88,22 @@ export default function QuestionItem({
 				{!hideDeleteButtons && (
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
-							<Button variant="destructive">
-								Delete Question
+							<Button
+								variant="destructive"
+								size="sm"
+								className="mt-1 print:hidden"
+							>
+								Delete
 							</Button>
 						</AlertDialogTrigger>
 						<AlertDialogContent>
 							<AlertDialogHeader>
 								<AlertDialogTitle>
-									Are you absolutely sure?
+									Confirm Deletion
 								</AlertDialogTitle>
 								<AlertDialogDescription>
-									This action cannot be undone. This will
-									permanently delete the question from the
-									database.
+									This will permanently delete the question.
+									Are you sure?
 								</AlertDialogDescription>
 							</AlertDialogHeader>
 							<AlertDialogFooter>
