@@ -16,23 +16,29 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import useQuizStore from "@/stores/quizStore";
 
 export default function QuestionItem({
 	quiz,
 	playlistId,
 	index,
-	deleteQuestion,
-	toggleAccordion,
-	isOpen,
-	hideDeleteButton,
 	serialNumber,
 }) {
+	const {
+		toggleAccordion,
+		deleteQuestion,
+		hideDeleteButtons,
+		openAccordions,
+	} = useQuizStore();
+
 	const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"];
+	const accordionId = `${playlistId}-${index}`;
+	const isOpen = openAccordions[accordionId];
 
 	return (
-		<AccordionItem value={`${playlistId}-${index}`}>
+		<AccordionItem value={accordionId}>
 			<AccordionTrigger
-				onClick={() => toggleAccordion(`${playlistId}-${index}`)}
+				onClick={() => toggleAccordion(accordionId)}
 				className="flex flex-col items-start text-left"
 			>
 				<div className="flex w-full text-left px-4 py-2">
@@ -80,7 +86,7 @@ export default function QuestionItem({
 						/>
 					</div>
 				)}
-				{!hideDeleteButton && (
+				{!hideDeleteButtons && (
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
 							<Button variant="destructive">
