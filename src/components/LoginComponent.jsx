@@ -3,7 +3,7 @@ import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../lib/firebaseConfig";
 
-const LoginComponent = ({ onLogin }) => {
+const LoginComponent = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -12,8 +12,8 @@ const LoginComponent = ({ onLogin }) => {
     e.preventDefault();
     const auth = getAuth(app);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      onLogin(userCredential.user);
+      await signInWithEmailAndPassword(auth, email, password);
+      // The Header component will handle the auth state change
     } catch (error) {
       setError(error.message);
     }
