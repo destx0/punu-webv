@@ -1,13 +1,16 @@
 "use client";
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "../lib/firebaseConfig";
+import useQuizStore from "@/stores/quizStore";
 
-const UserProfile = ({ user, onLogout }) => {
+const UserProfile = ({ user }) => {
+  const setUserId = useQuizStore(state => state.setUserId);
+
   const handleLogout = async () => {
     const auth = getAuth(app);
     try {
       await signOut(auth);
-      onLogout();
+      // The auth state change will be handled by the onAuthStateChanged listener
     } catch (error) {
       console.error("Error signing out: ", error);
     }

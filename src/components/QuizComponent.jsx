@@ -1,10 +1,12 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import QuestionItem from "./QuestionItem";
 import useQuizStore from "@/stores/quizStore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app } from "@/lib/firebaseConfig";
 
 export default function QuizComponent() {
 	const {
@@ -17,11 +19,57 @@ export default function QuizComponent() {
 		deleteQuestion,
 		toggleHideDeleteButtons,
 		fetchData,
+		setUserId,
 	} = useQuizStore();
 
+	const [isLoading, setIsLoading] = useState(true);
+	const [user, setUser] = useState(null);
+
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		const auth = getAuth(app);
+		const unsubscribe = onAuthStateChanged(auth, (user) => {
+			if (user) {
+				console.log("User is signed in:", user.uid);
+				setUser(user);
+				setUserId(user.uid);
+			} else {
+				console.log("User is signed out");
+				setUser(null);
+				setUserId(null);
+			}
+			setIsLoading(false);
+		});
+
+		return () => unsubscribe();
+	}, [setUserId]);
+
+	useEffect(() => {
+		const loadData = async () => {
+			if (user) {
+				console.log("QuizComponent: Loading data for user ID:", user.uid);
+				await fetchData();
+			}
+		};
+
+		loadData();
+	}, [user, fetchData]);
+
+	useEffect(() => {
+		console.log("QuizComponent: Playlists updated:", playlists);
+		console.log("QuizComponent: Questions updated:", questions);
+	}, [playlists, questions]);
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
+
+	if (!user) {
+		return <div>Please log in to view your quizzes.</div>;
+	}
+
+	if (playlists.length === 0) {
+		return <div>No playlists found. Please create a playlist.</div>;
+	}
 
 	return (
 		<Tabs defaultValue={playlists[0]?.id}>

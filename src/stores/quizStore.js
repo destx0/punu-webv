@@ -1,24 +1,29 @@
 import { create } from "zustand";
 import { db } from "@/lib/firebaseConfig";
 import {
-	collection,
-	getDocs,
 	doc,
 	getDoc,
 	deleteDoc,
 	updateDoc,
+	arrayRemove,
 } from "firebase/firestore";
+import { getPlaylistNames, getQuizzesForPlaylist } from "@/lib/firebaseConfig";
 
-const useQuizStore = create((set) => ({
+const useQuizStore = create((set, get) => ({
 	playlists: [],
 	questions: {},
 	openAccordions: {},
 	hideDeleteButtons: false,
+	userId: null,
 
 	setPlaylists: (playlists) => set({ playlists }),
 	setQuestions: (questions) => set({ questions }),
 	setOpenAccordions: (openAccordions) => set({ openAccordions }),
 	setHideDeleteButtons: (hideDeleteButtons) => set({ hideDeleteButtons }),
+	setUserId: (userId) => {
+		console.log("Setting user ID:", userId);
+		set({ userId });
+	},
 
 	toggleAllAccordions: (playlistId) =>
 		set((state) => {
@@ -41,16 +46,12 @@ const useQuizStore = create((set) => ({
 		})),
 
 	deleteQuestion: async (playlistId, questionId) => {
+		const { userId } = useQuizStore.getState();
 		try {
 			await deleteDoc(doc(db, "quizzes", questionId));
-			const questionlistDoc = await getDoc(
-				doc(db, "questionlists", playlistId)
-			);
-			const updatedQuizIds = questionlistDoc
-				.data()
-				.quizIds.filter((id) => id !== questionId);
-			await updateDoc(doc(db, "questionlists", playlistId), {
-				quizIds: updatedQuizIds,
+			const userRef = doc(db, "users", userId);
+			await updateDoc(userRef, {
+				[`playlists.${playlistId}.quizIds`]: arrayRemove(questionId),
 			});
 			set((state) => ({
 				questions: {
@@ -69,30 +70,26 @@ const useQuizStore = create((set) => ({
 		set((state) => ({ hideDeleteButtons: !state.hideDeleteButtons })),
 
 	fetchData: async () => {
+		const userId = get().userId;
+		console.log("Fetching data for user ID:", userId);
+		if (!userId) {
+			console.error("User ID not set, cannot fetch data");
+			return;
+		}
 		try {
-			const playlistsSnapshot = await getDocs(
-				collection(db, "playlists")
-			);
-			const playlistsData = playlistsSnapshot.docs.map((doc) => ({
-				id: doc.id,
-				...doc.data(),
-			}));
+			console.log("Fetching playlist names");
+			const playlistsData = await getPlaylistNames(userId);
+			console.log("Fetched playlists:", playlistsData);
 			set({ playlists: playlistsData });
 
 			const questionsData = {};
 			for (const playlist of playlistsData) {
-				const questionlistDoc = await getDoc(
-					doc(db, "questionlists", playlist.id)
-				);
-				const quizIds = questionlistDoc.data().quizIds;
-				const quizzes = await Promise.all(
-					quizIds.map((id) => getDoc(doc(db, "quizzes", id)))
-				);
-				questionsData[playlist.id] = quizzes.map((quizDoc) => ({
-					id: quizDoc.id,
-					...quizDoc.data(),
-				}));
+				console.log(`Fetching quizzes for playlist: ${playlist.id}`);
+				const quizzes = await getQuizzesForPlaylist(userId, playlist.id);
+				console.log(`Fetched quizzes for playlist ${playlist.id}:`, quizzes);
+				questionsData[playlist.id] = quizzes;
 			}
+			console.log("Setting questions data:", questionsData);
 			set({ questions: questionsData });
 		} catch (error) {
 			console.error("Error fetching data from Firestore:", error);

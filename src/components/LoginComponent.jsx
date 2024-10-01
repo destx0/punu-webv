@@ -1,19 +1,34 @@
 "use client";
-import { useState } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useState, useEffect } from "react";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { app } from "../lib/firebaseConfig";
+import useQuizStore from "@/stores/quizStore";
 
 const LoginComponent = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const setUserId = useQuizStore(state => state.setUserId);
+
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [setUserId]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const auth = getAuth(app);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // The Header component will handle the auth state change
+      // The auth state change will be handled by the onAuthStateChanged listener
     } catch (error) {
       setError(error.message);
     }
