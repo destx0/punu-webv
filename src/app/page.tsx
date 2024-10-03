@@ -6,12 +6,12 @@ import QuizComponent from "@/components/QuizComponent";
 import LoginComponent from "@/components/LoginComponent";
 
 export default function Home() {
-	const [user, setUser] = useState(null);
+	const [user, setUser] = useState<User | null>(null);
 
 	useEffect(() => {
 		const auth = getAuth(app);
 		const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-			setUser(currentUser as User | null);
+			setUser(currentUser);
 		});
 
 		return () => unsubscribe();

@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 export default function QuizCard({ question, options, correctAnswer, explanation, onNext }) {
   const [showAnswer, setShowAnswer] = useState(false);
+
+  const handleNext = useCallback(() => {
+    setShowAnswer(false);
+    onNext();
+  }, [onNext]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -17,12 +22,7 @@ export default function QuizCard({ question, options, correctAnswer, explanation
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [onNext]);
-
-  const handleNext = () => {
-    setShowAnswer(false);
-    onNext();
-  };
+  }, [handleNext]);
 
   return (
     <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
