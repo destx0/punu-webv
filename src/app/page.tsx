@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { app } from "@/lib/firebaseConfig";
 import QuizComponent from "@/components/QuizComponent";
 import LoginComponent from "@/components/LoginComponent";
